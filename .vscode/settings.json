@@ -1,0 +1,12 @@
+{
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+    "editor.formatOnSave": true,
+    "editor.formatOnPaste": true,
+    "editor.formatOnSaveMode": "modifications",
+    "[scss]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[groovy]": {
+      "editor.defaultFormatter": "NicolasVuillamy.vscode-groovy-lint"
+    }
+}
