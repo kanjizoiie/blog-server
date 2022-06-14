@@ -3,21 +3,18 @@ node {
     checkout scm
   }
 
+  stage('Setup NPM repo') {
+    withCredentials([
+      string(credentialsId: 'registry', variable: 'TOKEN')
+    ]) {
+      sh 'touch .npmrc'
+      sh "echo '\n//${npmRepo}:_authToken=$TOKEN' >> .npmrc"
+      sh 'cat .npmrc'
+    }
+  }
+
   withDockerContainer(image: 'node:16.13.1-alpine') {
-    stage('Setup') {
-      sh "printenv"
-      echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
-    }
 
-    stage('Install') {
-      echo 'Installing Node Dependencies'
-      sh 'npm ci'
-    }
-
-    stage('Test') {
-      echo 'Testing application'
-      sh 'npm test'
-    }
   }
 
   docker.withRegistry('https://docker.nexus.marjoh.duckdns.org/', "nexus-docker") {
@@ -28,6 +25,23 @@ node {
     stage('Build Image') {
       echo "Building Image ${imageName}"
       def image = docker.build(imageName)
+
+      image.inside {
+        stage('Setup') {
+          sh "printenv"
+          echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
+        }
+
+        stage('Install') {
+          echo 'Installing Node Dependencies'
+          sh 'npm ci'
+        }
+
+        stage('Test') {
+          echo 'Testing application'
+          sh 'npm test'
+        }
+      }
       stage('Publish Image') {
         echo 'Deploying'
         if (env.BRANCH_NAME == 'main') {
