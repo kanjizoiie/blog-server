@@ -3,6 +3,8 @@ node {
     checkout scm
   }
 
+  npmRepo='nexus.marjoh.duckdns.org/repository/npm-group/';
+
   stage('Setup NPM repo') {
     withCredentials([
       string(credentialsId: 'registry', variable: 'TOKEN')
